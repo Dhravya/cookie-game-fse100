@@ -1,35 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import RootLayout from "./layout";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
+import Header from "~/components/Header";
 
 export default function HomePage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   return (
     <RootLayout>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="absolute w-full top-0 flex h-16 items-center justify-between px-8">
-          <div className="h-1"></div>
-          {session ? (
-            <div className="flex">
-              <div className="flex items-center gap-4">
-                <Image
-                  className="rounded-full"
-                  src={session.user.image ? session.user.image : ""}
-                  alt="User avatar"
-                  unoptimized
-                  width={32}
-                  height={32}
-                />
-                <div>{session.user.name}</div>
-              </div>
-              <button className="ml-4" onClick={() => signOut()}>Logout</button>
-            </div>
-          ) : (
-            <button onClick={() => signIn("google")}>Click here to log in</button>
-          )}
-        </div>
+        <Header />
+
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-16 ">
           <Image
             className="rounded-full"
@@ -46,7 +28,7 @@ export default function HomePage() {
           {session ? (
             <>
               {" "}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-8">
                 <Link
                   className="flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4 hover:bg-black/20"
                   href="/game-1"
@@ -59,13 +41,37 @@ export default function HomePage() {
                   </div>
                 </Link>
                 <Link
-                  aria-disabled={true}
-                  className="flex max-w-xs cursor-not-allowed flex-col gap-4 rounded-xl bg-black/10 p-4 hover:bg-black/20"
-                  href="/"
-                  target="_blank"
+                  aria-disabled={session.user.cookies < 1000 ? "true" : "false"}
+                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4  ${
+                    session.user.cookies > 1000
+                      ? " hover:bg-black/20"
+                      : "cursor-not-allowed bg-black/30"
+                  }`}
+                  href={session.user.cookies > 1000 ? "/game-2" : "/"}
                 >
-                  <h3 className="text-2xl font-bold">Game 2</h3>
-                  <div className="text-lg">Game 2 is currently disabled.</div>
+                  <h3 className="text-2xl font-bold">Game 2: Cookie racer</h3>
+                  <div className="text-lg">
+                    {session.user.cookies > 1000
+                      ? "Cookie racer"
+                      : "Get 1000 cookies to unlock this game"}
+                  </div>
+                </Link>
+
+                <Link
+                  aria-disabled={session.user.cookies < 5000 ? "true" : "false"}
+                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4  ${
+                    session.user.cookies > 5000
+                      ? " hover:bg-black/20"
+                      : "cursor-not-allowed bg-black/30"
+                  }`}
+                  href={session.user.cookies > 5000 ? "/game-3" : "/"}
+                >
+                  <h3 className="text-2xl font-bold">Game 3: Dalgona Cookie</h3>
+                  <div className="text-lg">
+                    {session.user.cookies > 5000
+                      ? "Trace the cookie"
+                      : "Get 5000 cookies to unlock this game"}
+                  </div>
                 </Link>
               </div>
             </>

@@ -14,6 +14,17 @@ function App() {
   const [isWrong, setIsWrong] = useState(false);
 
   useEffect(() => {
+    if (attempts > 3) {
+      const response = fetch('/api/addCookies?cookies=' + score/10).then((res) => {
+        if (res.status === 200) {
+          alert("You earnt " + score/10 + " cookies");
+        } else {
+          alert("Something went wrong");
+        }
+      }
+      );
+      console.log(response)
+    }
     if (attempts < 3 && timeLeft > 0) {
       const timer = setTimeout(() => {
         setTimeLeft((prevTime) => prevTime - 1);
@@ -94,6 +105,7 @@ function App() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
           <p className="text-xl font-bold">Game Over</p>
           <p className="mt-4">Your Score: {score}</p>
+          <p className="mt-4">You earnt: {score/10} cookies</p>
           <button
             onClick={() => {
               window.location.reload();

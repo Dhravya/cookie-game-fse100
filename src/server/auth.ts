@@ -1,13 +1,17 @@
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
+import { AdapterUser } from "next-auth/adapters";
+import { Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
+import { JWT } from "next-auth/jwt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -19,15 +23,16 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
+      cookies: number;
       // ...other properties
       // role: UserRole;
     };
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+   cookies: number
+  }
 }
 
 /**
@@ -36,25 +41,17 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-  callbacks: {
-    async session({ session, token, user }) {
-      const userInfo = await db.user.findFirst({
-        where: { email: session.user.email },
-      });
-      // If user not found, create it
-      if (!userInfo) {
-        await db.user.create({
-          data: {
-            email: session.user.email,
-            name: session.user.name,
-            image: session.user.image,
-          },
-        });
-      }
+  adapter: PrismaAdapter(db),
 
+  callbacks: {
+
+    session: async ({session, token, user}:{session: Session ,token: JWT, user: AdapterUser}) => {
+      session.user.cookies = user.cookies
       return Promise.resolve(session)
     },
   },
+
+
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
