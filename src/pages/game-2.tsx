@@ -1,52 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
-const COOKIE_WORDS: string[] = [
-  'chocolate',
-  'sugar',
-  'biscuit',
-  'snickerdoodle',
-  'gingersnap',
-  'shortbread',
-  'macaroon',
-  'oatmeal',
-  'butter',
-  'dough'
+const COOKIE_WORDS = [
+  "chocolate",
+  "sugar",
+  "biscuit",
+  "snickerdoodle",
+  "gingersnap",
+  "shortbread",
+  "macaroon",
+  "oatmeal",
+  "butter",
+  "dough",
 ];
 
 const TIME_LIMIT = 10; // Seconds allowed for each word
 
-const getRandomWord = (): string => {
+const getRandomWord = () => {
   return COOKIE_WORDS[Math.floor(Math.random() * COOKIE_WORDS.length)]!;
 };
 
-const SpeedTypingGame  = () => {
-  const [word, setWord] = useState<string>(''); // We start with an empty string
-  const [userInput, setUserInput] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState<number>(TIME_LIMIT);
-  const [points, setPoints] = useState<number>(0);
-  const [isGameRunning, setIsGameRunning] = useState<boolean>(false);
-  const [hasGameStarted, setHasGameStarted] = useState<boolean>(false);
+const SpeedTypingGame = () => {
+  const [word, setWord] = useState("");
+  const [userInput, setUserInput] = useState("");
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [points, setPoints] = useState(0);
+  const [isGameRunning, setIsGameRunning] = useState(false);
+  const [hasGameStarted, setHasGameStarted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef(0);
 
   useEffect(() => {
-    // This will only execute once on client side mount to prevent mismatch
     setWord(getRandomWord());
   }, []);
 
-  const startGame = (): void => {
-    setUserInput('');
+  const startGame = () => {
+    setUserInput("");
     setWord(getRandomWord());
     setIsGameRunning(true);
-    setHasGameStarted(true); // Set to true when the game starts
+    setHasGameStarted(true);
     setTimeLeft(TIME_LIMIT);
     setPoints(0);
-    inputRef.current?.focus();
 
-    timerRef.current = setInterval(() => {
+    if (inputRef.current) inputRef.current.focus();
+
+    // Clear any existing timers before setting a new one
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = window.setInterval(() => {
       setTimeLeft((prevTimeLeft) => {
         if (prevTimeLeft === 1) {
-          clearInterval(timerRef.current!);
+          clearInterval(timerRef.current);
           setIsGameRunning(false);
           return 0;
         }
@@ -55,57 +58,73 @@ const SpeedTypingGame  = () => {
     }, 1000);
   };
 
-  const resetTimer = (): void => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setTimeLeft(TIME_LIMIT);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const newValue = e.target.value;
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
     setUserInput(newValue);
 
     if (newValue.toLowerCase() === word.toLowerCase()) {
-      setPoints((prevPoints) => prevPoints + 1);
+      setPoints((prevPoints) => prevPoints + 100);
       setWord(getRandomWord());
-      setUserInput('');
-      resetTimer();
+      setUserInput("");
+      // Do not reset the timer after a correct word is typed
     }
   };
 
   useEffect(() => {
     if (!isGameRunning && hasGameStarted) {
+      const response = fetch("/api/addCookies?cookies=" + points / 10).then(
+        (res) => {
+          if (res.status === 200) {
+            alert("You earnt " + points * 10 + " cookies");
+          } else {
+            alert("Something went wrong");
+          }
+        },
+      );
+      console.log(response);
       alert(`Game over! Your score is ${points} point(s).`);
+      // Cleanup the timer when the game is over
       if (timerRef.current) clearInterval(timerRef.current);
     }
   }, [isGameRunning, hasGameStarted, points]);
 
   useEffect(() => {
     return () => {
-      // Clean up the interval on component unmount
+      // Clean up the timer when the component unmounts
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
-      <h1 className="text-4xl text-center text-gray-800 mb-6">🍪 Cookie Themed Speed Typing Game 🍪</h1>
-      <p className="mb-2 text-lg">Type the following word as fast as you can!</p>
-      <h2 className="mb-4 text-2xl font-semibold bg-yellow-200 p-3 rounded shadow">{word}</h2>
+    <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
+      <h1 className="mb-6 text-center text-4xl text-gray-800">
+        🍪 Cookie Themed Speed Typing Game 🍪
+      </h1>
+      <p className="mb-2 text-lg">
+        Type the following word as fast as you can!
+      </p>
+      <h2 className="mb-4 rounded bg-yellow-200 p-3 text-2xl font-semibold shadow">
+        {word}
+      </h2>
       <input
         ref={inputRef}
         type="text"
         value={userInput}
         onChange={handleInputChange}
-        className="border-2 border-gray-300 bg-white h-10 px-5 rounded-lg text-sm focus:outline-none"
+        className="h-10 rounded-lg border-2 border-gray-300 bg-white px-5 text-sm focus:outline-none"
         disabled={!isGameRunning}
       />
       <p className="mt-2 text-red-500">Time left: {timeLeft}</p>
       <button
         onClick={startGame}
-        className={`mt-4 px-8 py-2 rounded ${isGameRunning ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'} text-white font-bold focus:outline-none`}
+        className={`mt-4 rounded px-8 py-2 ${
+          isGameRunning
+            ? "cursor-not-allowed bg-gray-400"
+            : "bg-blue-500 hover:bg-blue-700"
+        } font-bold text-white focus:outline-none`}
         disabled={isGameRunning}
       >
-        {isGameRunning ? 'Game in progress...' : 'Start Game'}
+        {isGameRunning ? "Game in progress..." : "Start Game"}
       </button>
       <p className="mt-4 text-green-700">Points: {points}</p>
     </div>
