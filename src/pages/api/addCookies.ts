@@ -23,7 +23,6 @@ export default async function NextAPI(req: NextApiRequest, res: NextApiResponse<
         session.user.cookies = cookies ? session.user.cookies + Number(cookies) : session.user.cookies
 
         res.status(200).json({ success: true })
-        session.user.cookies = cookies ? session.user.cookies + Number(cookies) : session.user.cookies
     }
 
     res.status(200).json({ success: true })
