@@ -29,9 +29,16 @@ const SpeedTypingGame = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef(0);
 
+
   useEffect(() => {
     setWord(getRandomWord());
   }, []);
+
+  useEffect(() => {
+    if (isGameRunning) {
+      inputRef.current?.focus();
+    }
+  }, [isGameRunning]);
 
   const startGame = () => {
     setUserInput("");
@@ -40,8 +47,6 @@ const SpeedTypingGame = () => {
     setHasGameStarted(true);
     setTimeLeft(TIME_LIMIT);
     setPoints(0);
-
-    if (inputRef.current) inputRef.current.focus();
 
     // Clear any existing timers before setting a new one
     if (timerRef.current) clearInterval(timerRef.current);
@@ -82,7 +87,6 @@ const SpeedTypingGame = () => {
         },
       );
       console.log(response);
-      alert(`Game over! Your score is ${points} point(s).`);
       // Cleanup the timer when the game is over
       if (timerRef.current) clearInterval(timerRef.current);
     }

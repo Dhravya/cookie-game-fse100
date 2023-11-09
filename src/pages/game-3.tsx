@@ -142,7 +142,23 @@ const CookieShapeGame: React.FC = () => {
   }, [gameOver]);
 
   if (gameOver)
-    return <div className="text-center">Game Over! Your score: {points}</div>;
+    return (
+      <div className="text-center">
+        Game Over! Your score: {points}
+        {/* Reset game button */}
+        <button
+          className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+          onClick={() => {
+            setGameOver(false);
+            setPoints(0);
+            setTimeLimit(10);
+            setTimer(10);
+          }}
+        >
+          Play Again
+        </button>
+      </div>
+    );
 
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
