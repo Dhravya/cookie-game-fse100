@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Header from "~/components/Header";
 
 function App() {
   const { data: session, status } = useSession();
@@ -79,6 +80,7 @@ function App() {
       }`}
       onClick={onMissClick}
     >
+      <Header />
       {attempts < 3 ? (
         <>
           <div className="absolute left-5 top-5">

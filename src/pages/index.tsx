@@ -21,7 +21,13 @@ export default function HomePage() {
             width={200}
             height={200}
           />
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
+          <h1 
+            style={{
+              // text stroke
+              WebkitTextStroke: "2px #000",
+              WebkitTextFillColor: "#C79F5C",
+            }}
+          className="text-5xl font-extrabold tracking-tight sm:text-[5rem] text-[#C79F5C]">
             Cookie game
           </h1>
 
@@ -30,7 +36,7 @@ export default function HomePage() {
               {" "}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-8">
                 <Link
-                  className="flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4 hover:bg-black/20"
+                  className="flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4 hover:bg-black/20 bg-white"
                   href="/game-1"
                   target="_blank"
                 >
@@ -42,7 +48,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   aria-disabled={session.user.cookies < 1000 ? "true" : "false"}
-                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4  ${
+                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4 bg-white ${
                     session.user.cookies > 1000
                       ? " hover:bg-black/20"
                       : "cursor-not-allowed bg-black/30"
@@ -59,7 +65,7 @@ export default function HomePage() {
 
                 <Link
                   aria-disabled={session.user.cookies < 5000 ? "true" : "false"}
-                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4  ${
+                  className={`flex max-w-xs flex-col gap-4 rounded-xl border-2 border-black p-4 bg-white ${
                     session.user.cookies > 5000
                       ? " hover:bg-black/20"
                       : "cursor-not-allowed bg-black/30"

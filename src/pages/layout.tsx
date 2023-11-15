@@ -12,6 +12,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-      <div className={`font-sans ${inter.variable}`}>{children}</div>
+      <div
+        style={{
+          // Repeating bg.jpeg 
+          backgroundImage: `url('/bg.jpeg')`,
+          backgroundSize: "cover"
+        }}
+      className={`font-sans ${inter.variable}`}>{children}</div>
   );
 }
