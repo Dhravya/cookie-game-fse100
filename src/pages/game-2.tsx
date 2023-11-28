@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Header from "~/components/Header";
 
 const COOKIE_WORDS = [
   "chocolate",
@@ -101,6 +102,7 @@ const SpeedTypingGame = () => {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
+      <Header/>
       <h1 className="mb-6 text-center text-4xl text-gray-800">
         🍪 Cookie Themed Speed Typing Game 🍪
       </h1>

@@ -24,7 +24,11 @@ export default function HomePage() {
           <h1 
             style={{
               // text stroke
-              WebkitTextStroke: "2px #000",
+              textShadow: `
+                -2px -2px 0 #000,  
+                2px -2px 0 #000,
+                -2px  2px 0 #000,
+                 2px  2px 0 #000`,
               WebkitTextFillColor: "#C79F5C",
             }}
           className="text-5xl font-extrabold tracking-tight sm:text-[5rem] text-[#C79F5C]">
@@ -82,7 +86,7 @@ export default function HomePage() {
               </div>
             </>
           ) : (
-            <button onClick={() => signIn("google")}>Login with google</button>
+            <button className="px-4 py-2 rounded-full bg-white" onClick={() => signIn("google")}>Login with google</button>
           )}
         </div>
       </main>

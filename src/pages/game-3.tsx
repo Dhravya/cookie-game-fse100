@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Header from "~/components/Header";
 
 type CookieShape = "circle" | "square" | "triangle";
 
@@ -31,6 +32,7 @@ const CookieShapeGame: React.FC = () => {
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [timeLimit, setTimeLimit] = useState<number>(10);
   const [timer, setTimer] = useState<number>(10);
+  const [isWrongColor, setIsWrongColor] = useState("white");
 
   // Timer countdown logic
   useEffect(() => {
@@ -93,7 +95,12 @@ const CookieShapeGame: React.FC = () => {
       // Correct shape was dropped
       onCorrectDrop();
     } else {
-      setGameOver(true);
+      // set iswrong true for 0.1 second
+      setIsWrongColor("red");
+      setTimeout(() => {
+        setIsWrongColor("white");
+        setGameOver(true);
+      }, 100);
     }
   };
 
@@ -120,6 +127,10 @@ const CookieShapeGame: React.FC = () => {
   };
 
   const onCorrectDrop = () => {
+    setIsWrongColor("green");
+    setTimeout(() => {
+      setIsWrongColor("white");
+    }, 100);
     setPoints(points + 1);
     setCurrentShape(getRandomShape());
     decreaseTimeLimit(); // Call to decrease the time after scoring
@@ -131,9 +142,9 @@ const CookieShapeGame: React.FC = () => {
       const response = fetch("/api/addCookies?cookies=" + points / 10).then(
         (res) => {
           if (res.status === 200) {
-            alert("You earnt " + points * 10 + " cookies");
+            console.log("You earnt " + points * 10 + " cookies");
           } else {
-            alert("Something went wrong");
+            console.log("Something went wrong");
           }
         },
       );
@@ -161,47 +172,51 @@ const CookieShapeGame: React.FC = () => {
     );
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="mb-6 text-center text-4xl text-gray-800">
-        🍪 Cookie Shape Match Game 🍪
-      </h1>
-      <div className="fixed left-4 top-4 rounded-full bg-white p-3 text-black shadow-lg">
-        Timer: {timer}s
-      </div>
-      <div
-        draggable
-        onDragStart={(e) => handleDragStart(e, currentShape)}
-        className={`flex h-20 w-20 cursor-grab items-center justify-center rounded-md shadow-lg`}
-        style={{ backgroundColor: currentShape.color }}
-      >
-        <svg width="100%" height="100%" viewBox="0 0 100 100">
-          {getShapeSvg(currentShape.shape, currentShape.color)}
-        </svg>
-      </div>
-
-      <div className="mt-8 flex items-center justify-center space-x-4">
-        {shapes.map((shape) => (
-          <div
-            key={shape}
-            onDrop={(e) => handleDrop(e, shape)}
-            onDragOver={handleDragOver}
-            className={`flex h-24 w-24 items-center justify-center rounded-md border-2 border-gray-400`}
-          >
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 100 100"
-              className="text-gray-300"
+    <div
+      style={{ backgroundColor: isWrongColor }}
+      className="flex h-screen flex-col items-center justify-center p-4"
+    >
+      <Header/>
+      <div className="flex flex-col items-center justify-center rounded-md bg-gray-100 p-8">
+        <h1 className="mb-6 text-center text-4xl text-gray-800">
+          🍪 Cookie Shape Match Game 🍪
+        </h1>
+        <div className="fixed left-4 top-4 rounded-full bg-white p-3 text-black shadow-lg">
+          Timer: {timer}s
+        </div>
+        <div
+          draggable
+          onDragStart={(e) => handleDragStart(e, currentShape)}
+          className={`flex h-20 w-20 cursor-grab items-center justify-center rounded-md shadow-lg`}
+          style={{ backgroundColor: currentShape.color }}
+        >
+          <svg width="100%" height="100%" viewBox="0 0 100 100">
+            {getShapeSvg(currentShape.shape, currentShape.color)}
+          </svg>
+        </div>
+        <div className="mt-8 flex items-center justify-center space-x-4">
+          {shapes.map((shape) => (
+            <div
+              key={shape}
+              onDrop={(e) => handleDrop(e, shape)}
+              onDragOver={handleDragOver}
+              className={`flex h-24 w-24 items-center justify-center rounded-md border-2 border-gray-400`}
             >
-              {getShapeSvg(shape, "gray")}
-            </svg>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 text-green-700">
-        <p>Your score: {points}</p>
-      </div>
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 100 100"
+                className="text-gray-300"
+              >
+                {getShapeSvg(shape, "gray")}
+              </svg>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 text-green-700">
+          <p>Your score: {points}</p>
+        </div>
+      H</div>
     </div>
   );
 };
